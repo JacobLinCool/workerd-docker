@@ -23,4 +23,6 @@ COPY --from=builder /workdir/lib /lib
 
 WORKDIR /worker
 
-ENTRYPOINT ["/workerd", "serve", "worker.capnp"]
+ENTRYPOINT [ "/workerd" ]
+
+CMD [ "serve", "worker.capnp" ]
