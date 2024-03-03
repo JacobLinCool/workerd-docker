@@ -5,7 +5,7 @@ ARG TARGETARCH
 
 WORKDIR /workdir
 
-RUN apt-get update && apt-get install -y curl
+RUN apt-get update && apt-get install -y curl ca-certificates
 
 RUN if [ ${TARGETARCH} = "amd64" ]; then curl -LO https://github.com/cloudflare/workerd/releases/download/${WORKERD_VERSION}/workerd-linux-64.gz; fi
 RUN if [ ${TARGETARCH} = "arm64" ]; then curl -LO https://github.com/cloudflare/workerd/releases/download/${WORKERD_VERSION}/workerd-linux-arm64.gz; fi
@@ -18,10 +18,13 @@ RUN mkdir lib && \
 
 FROM busybox:glibc
 
+COPY --from=builder /etc/ssl/certs/ca-certificates.crt /etc/ssl/certs/ca-certificates.crt
 COPY --from=builder /workdir/workerd /workerd
 COPY --from=builder /workdir/lib /lib
 
 WORKDIR /worker
+
+ENV SSL_CERT_FILE=/etc/ssl/certs/ca-certificates.crt
 
 ENTRYPOINT [ "/workerd" ]
 
